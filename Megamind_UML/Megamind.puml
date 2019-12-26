@@ -1,0 +1,16 @@
+@startuml
+
+title Megamind
+
+[*] --> Waiting
+Button --> Turn : initNewGame();
+Turn --> Turn : wrongEntry();
+Turn --> Turn : checkResult(); showResults(); turn++;
+
+Turn --> Lost : turn >= 13 ?; showLostText();
+Lost --> Waiting
+Turn --> Won : checkResult(); showWonText();
+Won --> Waiting
+
+
+@enduml

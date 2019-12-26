@@ -64,12 +64,12 @@ const char textEnterCode[] = "Please enter your guess ";
 const char textExplaination[] = "";
 const char textWrongEntry[] = "";
 
-/* timer init for 20 Hz */
+/* timer init for 20 Hz for LED0 when the lost state was reached */
 void timer0Init(){
 
 }
 
-/* timer init for 1 Hz */
+/* timer init for 1 Hz for LED0 when the won state was reached */
 void timer1Init(){
 
 }
