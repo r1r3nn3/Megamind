@@ -4,8 +4,8 @@
  * Description : Example usage of the mastermind library functions
  *
  * Company : I&Q
- * Author : Hugo Arends
- * Date : July 2017
+ * Author : Alwin Rodewijk
+ * Date : 9-1-2020
  */ 
 
 #define F_CPU 16000000UL
@@ -81,7 +81,7 @@ void ReceiveString(char *str);
 void TransmitString(char *str);
 
 /* game variables */
-uint8_t showSecretCode = 1;		// 1 to show & 0 to hide
+uint8_t showSecretCode = 0;		// 1 to show & 0 to hide
 
 uint8_t turn = 0;
 #define MAX_TURNS 12
@@ -96,10 +96,6 @@ enum gameState
 {welcome, newGame, turnX, askInput, checkInput, showResults, won, lost, waiting}
 currentGameState;
 
-void init_Random_Number(){
-	// set seed of random number generation
-	srand(countForRandomSeed);
-}
 
 char generate_Random_Number(){
 	char returnValue[2];
@@ -227,11 +223,10 @@ void setup_New_Game(){
 	PB0_LED_OFF;
 }
 
-void DEBUG_PRINT_STATE(uint8_t state){
-	const char stateText[10][20] = {"welcome", "newGame", "turnX", "askInput", "checkInput", "showResults", "won", "lost", "waiting"};
-	TransmitString("--------- ");
-	TransmitString(stateText[state]);
-	TransmitString("\r\n");
+void resetBuffer(void){
+	for(uint8_t i = 0; i < BUFFER_SIZE; i++){
+				buffer[i] = '\0';
+			}
 }
 
 int main(void)
@@ -264,13 +259,15 @@ int main(void)
 		while (ReceiveByte() != '\n'){
 			;
 		}
-		init_Random_Number();
+		srand(countForRandomSeed);
 		TransmitString("Good job!\r\n");
 		_delay_ms(500);
 		TransmitString("You will have to guess the correct combination of ");
+		resetBuffer();
 		itoa(MM_DIGITS, buffer, 10);
 		TransmitString(buffer);
 		TransmitString(" numbers between 1 and 6.\nYou will have ");
+		resetBuffer();
 		itoa(MAX_TURNS, buffer, 10);
 		TransmitString(buffer);
 		TransmitString(" turns to find the correct combination.\r\n");
@@ -288,6 +285,7 @@ int main(void)
 
 		// Cheat mode
 		if (showSecretCode){
+			resetBuffer();
 			for (uint8_t i = 0; i < MM_DIGITS; i++){
 				buffer[i] = secret_code[i];
 			}
@@ -312,6 +310,7 @@ int main(void)
 		/*			Ask for input			*/
 		case askInput:
 		TransmitString("You have reached turn ");
+		resetBuffer();
 		itoa(turn, buffer, 10);
 		TransmitString(buffer);
 		TransmitString(".\r\n");
@@ -321,13 +320,12 @@ int main(void)
 		// ask for input until the input is between 1 and 6
 		while(askingForInput){
 			// reset the buffer
-			for(uint8_t i = 0; i < BUFFER_SIZE; i++){
-				buffer[i] = '\0';
-			}
+			
 			
 			// ask for numbers
 			TransmitString("Please enter your guess like this: '1234'\r\n");
 			_delay_ms(100);
+			resetBuffer();
 			ReceiveString(buffer);
 
 			// check if the input is correct
@@ -396,10 +394,12 @@ int main(void)
 		}
 
 		TransmitString("You have guessed ");
+		resetBuffer();
 		itoa(mm_result.correct_num_and_pos, buffer, 10);
 		TransmitString(buffer);
 		TransmitString(" with the correct number at the correct position.\r\n");
 		TransmitString("You have guessed ");
+		resetBuffer();
 		itoa(mm_result.correct_num, buffer, 10);
 		TransmitString(buffer);
 		TransmitString(" with the correct number.\r\n");
@@ -423,6 +423,10 @@ int main(void)
 		/*			Wait for a reset flag			*/
 		case waiting:
 		default:
+		while (!resetGame)
+		{
+			ReceiveByte();
+		}
 		_delay_ms(500);
 		break;
 		}
