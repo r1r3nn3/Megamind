@@ -89,8 +89,10 @@ uint8_t turn = 0;
 uint8_t lightLost = 0;
 uint8_t lightWon = 0;
 uint8_t lightCorrectNum[4] = {0, 0, 0, 0};
+uint8_t lightCorrectNumLEDstate[4] = {0, 0, 0, 0};
 uint8_t resetGame = 0;
 uint16_t countForRandomSeed = 0;
+uint8_t showLEDs = 0;
 char buffer[BUFFER_SIZE];
 enum gameState 
 {welcome, newGame, turnX, askInput, checkInput, showResults, won, lost, waiting}
@@ -122,17 +124,41 @@ ISR(TIMER0_COMPA_vect){
 	if(countB >= 8){
 		countB = 0;
 
-		if(lightCorrectNum[0] == 1){
-			PB0_LED_TOGGLE;
+		if(lightCorrectNum[0] == 1 && showLEDs == 1){
+			if(lightCorrectNumLEDstate[0] == 0){
+				PB0_LED_ON;
+				lightCorrectNumLEDstate[0] = 1;
+				} else {
+				PB0_LED_OFF;
+				lightCorrectNumLEDstate[0] = 0;
+			}
 		}
 		if(lightCorrectNum[1] == 1){
-			PB1_LED_TOGGLE;
+			if(lightCorrectNumLEDstate[1] == 0){
+				PB1_LED_ON;
+				lightCorrectNumLEDstate[1] = 1;
+				} else {
+				PB1_LED_OFF;
+				lightCorrectNumLEDstate[1] = 0;
+			}
 		}
 		if(lightCorrectNum[2] == 1){
-			PB2_LED_TOGGLE;
+			if(lightCorrectNumLEDstate[2] == 0){
+				PB2_LED_ON;
+				lightCorrectNumLEDstate[2] = 1;
+				} else {
+				PB2_LED_OFF;
+				lightCorrectNumLEDstate[2] = 0;
+			}
 		}
 		if(lightCorrectNum[3] == 1){
-			PB3_LED_TOGGLE;
+			if(lightCorrectNumLEDstate[3] == 0){
+				PB3_LED_ON;
+				lightCorrectNumLEDstate[3] = 1;
+				} else {
+				PB3_LED_OFF;
+				lightCorrectNumLEDstate[3] = 0;
+			}
 		}
 	}
 }
@@ -327,6 +353,7 @@ int main(void)
 
 		/*			Check the input			*/
 		case checkInput:
+		showLEDs = 0;
 		lightCorrectNum[0] = 0;
 		lightCorrectNum[1] = 0;
 		lightCorrectNum[2] = 0;
@@ -379,7 +406,7 @@ int main(void)
 				}
 			}
 		}
-
+		showLEDs = 1;
 		currentGameState = turnX;
 		break;
 
