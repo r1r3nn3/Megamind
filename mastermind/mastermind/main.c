@@ -1,10 +1,10 @@
 /*
 Create by:      Alwin Rodewijk
 Student nr:     635653
-Class:          
-Subject:        
-Teacher:        
-Date:           21-12-2019
+Class:          D-B1-ELTa
+Subject:        INMC
+Teacher:        Ewout Boks
+Date:           18-1-2020
 */
 
 #define F_CPU 16000000UL
