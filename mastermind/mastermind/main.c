@@ -80,7 +80,7 @@ void ReceiveString(char *str);
 void TransmitString(char *str);
 
 /* game variables */
-uint8_t showSecretCode = 1;		// 1 to show & 0 to hide  !!!! CHEAT MODE !!!!
+uint8_t showSecretCode = 0;		// 1 to show & 0 to hide  !!!! CHEAT MODE !!!!
 
 static mm_result_t mm_result;
 uint8_t turn = 0;
@@ -163,7 +163,7 @@ ISR(TIMER0_COMPA_vect){
 	}
 }
 
-/* Setup Timer 0 with a frequency of 80 Hz */
+/* Setup Timer 0 with a frequency of 40 Hz */
 void init_Timer0()
 {
 	// - CTC mode of operation with OCR0A as TOP
@@ -427,6 +427,14 @@ int main(void)
 
 		/*			Lost text			*/
 		case lost:
+		lightCorrectNum[0] = 0;
+		lightCorrectNum[1] = 0;
+		lightCorrectNum[2] = 0;
+		lightCorrectNum[3] = 0;
+		PB0_LED_OFF;
+		PB1_LED_OFF;
+		PB2_LED_OFF;
+		PB3_LED_OFF;
 		lightLost = 1;
 		TransmitString("You lost. Try again by pressing the reset button.\n");
 		currentGameState = waiting;
@@ -435,10 +443,6 @@ int main(void)
 		/*			Wait for a reset flag			*/
 		case waiting:
 		default:
-		while (!resetGame)
-		{
-			ReceiveByte();
-		}
 		_delay_ms(500);
 		break;
 		}
